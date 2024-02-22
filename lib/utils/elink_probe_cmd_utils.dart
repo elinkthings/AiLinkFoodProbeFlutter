@@ -44,6 +44,7 @@ class ElinkProbeCmdUtils {
   }
 
   /// 切换单位
+  /// unit 0: °C, 1: °F
   Future<List<int>> switchUnit(int unit) {
     if (_mac == null) return Future.value([]);
     final payload = [0x04, unit];

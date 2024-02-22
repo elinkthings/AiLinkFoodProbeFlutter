@@ -1,24 +1,24 @@
 # ailink
 
-##[中文](README_CN.md)
+##[English](README.md)
 
-AiLink probe and probe box protocol data processing Flutter library.
+AiLink探针和探针盒子协议数据处理Flutter库.
 
-## Necessary condition
+## 必备条件
 
-1. Acquired AILink Bluetooth communication protocol
-2. Have smart devices that support AILink Bluetooth module
-3. Have knowledge of Flutter development and debugging
+1. 已获取AILink蓝牙通讯协议
+2. 拥有支持AILink蓝牙模块的智能设备
+3. 具备Flutter开发和调试知识
 
-## UUID Description
-1. FFE1: Write A7 data
-2. FFE2: Monitor A7 data changes
-3. FFE3: Write A6 data and monitor A6 data changes
+## UUID说明
+1. FFE1: 写入A7数据
+2. FFE2: 监听A7数据变化
+3. FFE3: 写入A6数据和监听A6数据变化
 
 ## Android
 
-1. Add ```maven { url 'https://jitpack.io' }``` in android/build.gradle file
-``` groovy
+1. 在android/build.gradle文件中添加```maven { url 'https://jitpack.io' }```
+```
     allprojects {
         repositories {
             google()
@@ -29,7 +29,7 @@ AiLink probe and probe box protocol data processing Flutter library.
     }
 ```
 
-2. Modify ```minSdkVersion 21``` in the android/app/build.gradle file
+2. 在android/app/build.gradle文件中设置```minSdkVersion 21```
 ```groovy
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
@@ -43,8 +43,8 @@ AiLink probe and probe box protocol data processing Flutter library.
     }
 ```
 
-3. To use the flutter_blue_plus library, you need to add the required permissions to android/app/src/main/AndroidManifest.xml
-```xml
+3. 使用flutter_blue_plus库, 需要在android/app/src/main/AndroidManifest.xml文件中添加相关权限
+```
     <manifest xmlns:android="http://schemas.android.com/apk/res/android">
         <uses-permission android:name="android.permission.BLUETOOTH" />
         <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -53,8 +53,8 @@ AiLink probe and probe box protocol data processing Flutter library.
 ```
 
 ## iOS
-1. When using the flutter_blue_plus library, you need to add the required permissions to ios/Runner/Info.plist
-```xml
+1. 使用flutter_blue_plus库, 需要在ios/Runner/Info.plist文件中添加相关权限
+```
     <?xml version="1.0" encoding="UTF-8"?>
     <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
     <plist version="1.0">
@@ -75,60 +75,60 @@ AiLink probe and probe box protocol data processing Flutter library.
 
 ## Flutter
 ### ElinkProbeCmdUtils
-##### Probe Command Related
-1. Get version information:
+##### 探针指令相关
+1. 获取版本信息: 
 ```dart
     final cmd = getVersion();
 ```
-2. Sync time:
+2. 同步时间: 
 ```dart 
     syncTime({DateTime? dateTime})
 ```
-3. Get battery level:
+3. 获取电量:
 ```dart
   final cmd = getBattery();
 ```
-4. Switch unit:
+4. 切换单位:
 ```dart
     final cmd = switchUnit(unit); //0: °C, 1: °F
 ```
-5. Set data:
+5. 设置数据:
 ```dart
   import 'package:ailink_food_probe/model/elink_probe_info.dart';
 
   ElinkProbeInfo probeInfo;
   final cmd = setProbeInfo(probeInfo);
 ```
-6. Get data:
+6. 获取数据:
 ```dart
     final cmd = getProbeInfo();
 ```
-7. Clear data:
+7. 清除数据:
 ```dart
     final cmd = clearProbeInfo();
 ```
 
-##### Probe Box Command Related
-1. Switch unit:
+##### 探针盒子指令相关
+1. 切换单位:
 ```dart
     final cmd = switchUnitBox(unit); //0: °C, 1: °F
 ```
-2. Get probe data (based on the probe's MAC address):
+2. 获取探针数据(根据探针的mac地址):
 ```dart
     List<int> probeMac;
     final cmd = getBoxProbeInfo(probeMac);
 ```
-3. Set probe data (only the alarm temperature in the probe data is processed by the device, other data is not processed):
+3. 设置探针数据(探针数据中目前仅有报警温度设备端有处理，其它数据都未处理):
 ```dart
     import 'package:ailink_food_probe/model/elink_probe_info.dart';
 
     ElinkProbeInfo probeInfo;
     final cmd = setBoxProbeInfo(probeInfo);
 ```
-4. Clear probe data (based on the probe's MAC address):
+4. 清除探针数据(根据探针的mac地址):
 ```dart
     List<int> probeMac;
     final cmd = clearBoxProbeInfo(probeMac);
 ```
 
-For specific usage, please see example
+具体使用方法，请参照示例
