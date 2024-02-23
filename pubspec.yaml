@@ -1,7 +1,7 @@
 name: ailink_food_probe
 description: AiLink Probe and Probe Box Protocol Data Processing.
-version: 0.0.1
-homepage:
+version: 0.0.2
+homepage: https://github.com/elinkthings/AiLinkFoodProbeFlutter.git
 
 environment:
   sdk: '>=3.0.6 <4.0.0'
