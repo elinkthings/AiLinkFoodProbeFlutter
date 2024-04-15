@@ -45,90 +45,119 @@ AiLink probe and probe box protocol data processing Flutter library.
 
 3. To use the flutter_blue_plus library, you need to add the required permissions to android/app/src/main/AndroidManifest.xml
 ```xml
-    <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-        <uses-permission android:name="android.permission.BLUETOOTH" />
-        <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-        <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Tell Google Play Store that your app uses Bluetooth LE
+         Set android:required="true" if bluetooth is necessary -->
+    <uses-feature android:name="android.hardware.bluetooth_le" android:required="false" />
+
+    <!-- New Bluetooth permissions in Android 12
+    https://developer.android.com/about/versions/12/features/bluetooth-permissions -->
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" android:usesPermissionFlags="neverForLocation" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+
+    <!-- legacy for Android 11 or lower -->
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" android:maxSdkVersion="30"/>
+
+    <!-- legacy for Android 9 or lower -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" android:maxSdkVersion="28" />
+</manifest>
 ```
 
 ## iOS
 1. When using the flutter_blue_plus library, you need to add the required permissions to ios/Runner/Info.plist
 ```xml
-    <?xml version="1.0" encoding="UTF-8"?>
-    <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-    <plist version="1.0">
-        <dict>
-            <key>NSBluetoothAlwaysUsageDescription</key>
-            <string>Need BLE permission</string>
-            <key>NSBluetoothPeripheralUsageDescription</key>
-            <string>Need BLE permission</string>
-            <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-            <string>Need Location permission</string>
-            <key>NSLocationAlwaysUsageDescription</key>
-            <string>Need Location permission</string>
-            <key>NSLocationWhenInUseUsageDescription</key>
-            <string>Need Location permission</string>
-        </dict>
-    </plist>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>NSBluetoothAlwaysUsageDescription</key>
+        <string>This app always needs Bluetooth to function</string>
+        <key>NSBluetoothPeripheralUsageDescription</key>
+        <string>This app needs Bluetooth Peripheral to function</string>
+        <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+        <string>This app always needs location and when in use to function</string>
+        <key>NSLocationAlwaysUsageDescription</key>
+        <string>This app always needs location to function</string>
+        <key>NSLocationWhenInUseUsageDescription</key>
+        <string>This app needs location when in use to function</string>
+    </dict>
+</plist>
 ```
 
 ## Flutter
-### ElinkProbeCmdUtils
-##### Probe Command Related
+### Probe Command Related
+#### ElinkProbeCmdUtils
+```dart
+    import 'package:ailink_food_probe/utils/elink_probe_cmd_utils.dart';
+
+    List<int> probeMac;
+    final elinkProbeCmdUtils = ElinkProbeCmdUtils(probeMac);
+```
 1. Get version information:
 ```dart
-    final cmd = getVersion();
+    final cmd = elinkProbeCmdUtils.getVersion();
 ```
-2. Sync time:
-```dart 
-    syncTime({DateTime? dateTime})
-```
-3. Get battery level:
+2. Get battery level:
 ```dart
-  final cmd = getBattery();
+  final cmd = elinkProbeCmdUtils.getBattery();
 ```
-4. Switch unit:
+3. Switch unit:
 ```dart
-    final cmd = switchUnit(unit); //0: °C, 1: °F
+    final cmd = elinkProbeCmdUtils.switchUnit(unit); //0: °C, 1: °F
 ```
-5. Set data:
+4. Set data:
 ```dart
   import 'package:ailink_food_probe/model/elink_probe_info.dart';
 
   ElinkProbeInfo probeInfo;
-  final cmd = setProbeInfo(probeInfo);
+  final cmd = elinkProbeCmdUtils.setProbeInfo(probeInfo);
 ```
-6. Get data:
+5. Get data:
 ```dart
-    final cmd = getProbeInfo();
+    final cmd = elinkProbeCmdUtils.getProbeInfo();
 ```
-7. Clear data:
+6. Clear data:
 ```dart
-    final cmd = clearProbeInfo();
+    final cmd = elinkProbeCmdUtils.clearProbeInfo();
 ```
 
-##### Probe Box Command Related
-1. Switch unit:
+### Probe Box Command Related
+#### ElinkProbeBoxCmdUtils
 ```dart
-    final cmd = switchUnitBox(unit); //0: °C, 1: °F
+    import 'package:ailink_food_probe/utils/elink_probe_box_cmd_utils.dart';
+    List<int> probeBoxMac;
+    final elinkProbeBoxCmdUtils = ElinkProbeBoxCmdUtils(probeBoxMac);
 ```
-2. Get probe data (based on the probe's MAC address):
+1. Get version information:
+```dart
+    final cmd = elinkProbeBoxCmdUtils.getVersion();
+```
+2. Sync time:
+```dart 
+    final cmd = elinkProbeBoxCmdUtils.syncTime(dateTime);
+```
+3. Switch unit:
+```dart
+    final cmd = elinkProbeBoxCmdUtils.switchUnit(unit); //0: °C, 1: °F
+```
+4. Get probe data (based on the probe's MAC address):
 ```dart
     List<int> probeMac;
-    final cmd = getBoxProbeInfo(probeMac);
+    final cmd = elinkProbeBoxCmdUtils.getBoxProbeInfo(probeMac);
 ```
-3. Set probe data (only the alarm temperature in the probe data is processed by the device, other data is not processed):
+5. Set probe data (only the alarm temperature in the probe data is processed by the device, other data is not processed):
 ```dart
     import 'package:ailink_food_probe/model/elink_probe_info.dart';
 
     ElinkProbeInfo probeInfo;
-    final cmd = setBoxProbeInfo(probeInfo);
+    final cmd = elinkProbeBoxCmdUtils.setBoxProbeInfo(probeInfo);
 ```
-4. Clear probe data (based on the probe's MAC address):
+6. Clear probe data (based on the probe's MAC address):
 ```dart
     List<int> probeMac;
-    final cmd = clearBoxProbeInfo(probeMac);
+    final cmd = elinkProbeBoxCmdUtils.clearBoxProbeInfo(probeMac);
 ```
 
 For specific usage, please see example

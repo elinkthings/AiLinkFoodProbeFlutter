@@ -44,91 +44,120 @@ AiLink探针和探针盒子协议数据处理Flutter库.
 ```
 
 3. 使用flutter_blue_plus库, 需要在android/app/src/main/AndroidManifest.xml文件中添加相关权限
-```
-    <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-        <uses-permission android:name="android.permission.BLUETOOTH" />
-        <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-        <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+```xml
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Tell Google Play Store that your app uses Bluetooth LE
+         Set android:required="true" if bluetooth is necessary -->
+    <uses-feature android:name="android.hardware.bluetooth_le" android:required="false" />
+
+    <!-- New Bluetooth permissions in Android 12
+    https://developer.android.com/about/versions/12/features/bluetooth-permissions -->
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN" android:usesPermissionFlags="neverForLocation" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+
+    <!-- legacy for Android 11 or lower -->
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" android:maxSdkVersion="30"/>
+
+    <!-- legacy for Android 9 or lower -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" android:maxSdkVersion="28" />
+</manifest>
 ```
 
 ## iOS
 1. 使用flutter_blue_plus库, 需要在ios/Runner/Info.plist文件中添加相关权限
-```
-    <?xml version="1.0" encoding="UTF-8"?>
-    <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-    <plist version="1.0">
-        <dict>
-            <key>NSBluetoothAlwaysUsageDescription</key>
-            <string>Need BLE permission</string>
-            <key>NSBluetoothPeripheralUsageDescription</key>
-            <string>Need BLE permission</string>
-            <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-            <string>Need Location permission</string>
-            <key>NSLocationAlwaysUsageDescription</key>
-            <string>Need Location permission</string>
-            <key>NSLocationWhenInUseUsageDescription</key>
-            <string>Need Location permission</string>
-        </dict>
-    </plist>
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>NSBluetoothAlwaysUsageDescription</key>
+        <string>This app always needs Bluetooth to function</string>
+        <key>NSBluetoothPeripheralUsageDescription</key>
+        <string>This app needs Bluetooth Peripheral to function</string>
+        <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+        <string>This app always needs location and when in use to function</string>
+        <key>NSLocationAlwaysUsageDescription</key>
+        <string>This app always needs location to function</string>
+        <key>NSLocationWhenInUseUsageDescription</key>
+        <string>This app needs location when in use to function</string>
+    </dict>
+</plist>
 ```
 
 ## Flutter
-### ElinkProbeCmdUtils
-##### 探针指令相关
+### 探针指令相关
+##### ElinkProbeCmdUtils
+```dart
+    import 'package:ailink_food_probe/utils/elink_probe_cmd_utils.dart';
+
+    List<int> probeMac;
+    final elinkProbeCmdUtils = ElinkProbeCmdUtils(probeMac);
+```
 1. 获取版本信息: 
 ```dart
-    final cmd = getVersion();
+    final cmd = elinkProbeCmdUtils.getVersion();
 ```
-2. 同步时间: 
-```dart 
-    syncTime({DateTime? dateTime})
-```
-3. 获取电量:
+2. 获取电量:
 ```dart
-  final cmd = getBattery();
+  final cmd = elinkProbeCmdUtils.getBattery();
 ```
-4. 切换单位:
+3. 切换单位:
 ```dart
-    final cmd = switchUnit(unit); //0: °C, 1: °F
+    final cmd = elinkProbeCmdUtils.switchUnit(unit); //0: °C, 1: °F
 ```
-5. 设置数据:
+4. 设置数据:
 ```dart
   import 'package:ailink_food_probe/model/elink_probe_info.dart';
 
   ElinkProbeInfo probeInfo;
-  final cmd = setProbeInfo(probeInfo);
+  final cmd = elinkProbeCmdUtils.setProbeInfo(probeInfo);
 ```
-6. 获取数据:
+5. 获取数据:
 ```dart
-    final cmd = getProbeInfo();
+    final cmd = elinkProbeCmdUtils.getProbeInfo();
 ```
-7. 清除数据:
+6. 清除数据:
 ```dart
-    final cmd = clearProbeInfo();
+    final cmd = elinkProbeCmdUtils.clearProbeInfo();
 ```
 
-##### 探针盒子指令相关
-1. 切换单位:
+### 探针盒子指令相关
+##### ElinkProbeBoxCmdUtils
 ```dart
-    final cmd = switchUnitBox(unit); //0: °C, 1: °F
+    import 'package:ailink_food_probe/utils/elink_probe_box_cmd_utils.dart';
+    List<int> probeBoxMac;
+    final elinkProbeBoxCmdUtils = ElinkProbeBoxCmdUtils(probeBoxMac);
 ```
-2. 获取探针数据(根据探针的mac地址):
+1. 获取版本信息:
+```dart
+    final cmd = elinkProbeBoxCmdUtils.getVersion();
+```
+2. 同步时间:
+```dart 
+    final cmd = elinkProbeBoxCmdUtils.syncTime(dateTime);
+```
+3. 切换单位:
+```dart
+    final cmd = elinkProbeBoxCmdUtils.switchUnit(unit); //0: °C, 1: °F
+```
+4. 获取探针数据(根据探针的mac地址):
 ```dart
     List<int> probeMac;
-    final cmd = getBoxProbeInfo(probeMac);
+    final cmd = elinkProbeBoxCmdUtils.getBoxProbeInfo(probeMac);
 ```
-3. 设置探针数据(探针数据中目前仅有报警温度设备端有处理，其它数据都未处理):
+5. 设置探针数据(探针数据中目前仅有报警温度设备端有处理，其它数据都未处理):
 ```dart
     import 'package:ailink_food_probe/model/elink_probe_info.dart';
 
     ElinkProbeInfo probeInfo;
-    final cmd = setBoxProbeInfo(probeInfo);
+    final cmd = elinkProbeBoxCmdUtils.setBoxProbeInfo(probeInfo);
 ```
-4. 清除探针数据(根据探针的mac地址):
+6. 清除探针数据(根据探针的mac地址):
 ```dart
     List<int> probeMac;
-    final cmd = clearBoxProbeInfo(probeMac);
+    final cmd = elinkProbeBoxCmdUtils.clearBoxProbeInfo(probeMac);
 ```
 
 具体使用方法，请参照示例
