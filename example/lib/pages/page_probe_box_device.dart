@@ -10,7 +10,7 @@ import 'package:ailink_food_probe/model/elink_probe_box_info.dart';
 import 'package:ailink_food_probe/model/elink_probe_info.dart';
 import 'package:ailink_food_probe/utils/elink_probe_config.dart';
 import 'package:ailink_food_probe/utils/elink_probe_data_parse_utils.dart';
-import 'package:ailink_food_probe/utils/elink_probe_cmd_utils.dart';
+import 'package:ailink_food_probe/utils/elink_probe_box_cmd_utils.dart';
 import 'package:ailink_food_probe_example/model/connect_device_model.dart';
 import 'package:ailink_food_probe_example/utils/extensions.dart';
 import 'package:ailink_food_probe_example/utils/log_utils.dart';
@@ -44,7 +44,7 @@ class _ProbeBoxDevicePageState extends State<ProbeBoxDevicePage> {
   BluetoothCharacteristic? _dataA7Characteristic;
   BluetoothCharacteristic? _dataA6Characteristic;
 
-  late ElinkProbeCmdUtils _elinkProbeSendCmdUtils;
+  late ElinkProbeBoxCmdUtils _elinkProbeBoxSendCmdUtils;
   late ElinkProbeDataParseUtils _elinkProbeDataParseUtils;
 
   @override
@@ -81,10 +81,8 @@ class _ProbeBoxDevicePageState extends State<ProbeBoxDevicePage> {
     final connectDeviceModel =
         ModalRoute.of(context)?.settings.arguments as ConnectDeviceModel;
     _bluetoothDevice = connectDeviceModel.device;
-    _elinkProbeSendCmdUtils =
-        ElinkProbeCmdUtils(connectDeviceModel.bleData.macArr);
-    _elinkProbeDataParseUtils =
-        ElinkProbeDataParseUtils(connectDeviceModel.bleData.macArr);
+    _elinkProbeBoxSendCmdUtils = ElinkProbeBoxCmdUtils(connectDeviceModel.bleData.macArr);
+    _elinkProbeDataParseUtils = ElinkProbeDataParseUtils(connectDeviceModel.bleData.macArr);
     _elinkProbeDataParseUtils.setCallback(onGetVersion: (version) {
       _addLog('onGetVersion: $version');
     }, onRequestSyncTime: () {
@@ -171,7 +169,7 @@ class _ProbeBoxDevicePageState extends State<ProbeBoxDevicePage> {
             children: [
               OperateBtnWidget(
                 onPressed: () {
-                  final data = _elinkProbeSendCmdUtils.getVersion();
+                  final data = _elinkProbeBoxSendCmdUtils.getVersion();
                   _addLog('getVersion: ${data.toHex()}');
                   _dataA6Characteristic?.write(data);
                 },
@@ -179,7 +177,7 @@ class _ProbeBoxDevicePageState extends State<ProbeBoxDevicePage> {
               ),
               OperateBtnWidget(
                 onPressed: () {
-                  final data = _elinkProbeSendCmdUtils.syncTime();
+                  final data = _elinkProbeBoxSendCmdUtils.syncTime();
                   _addLog('syncTime: ${data.toHex()}');
                   _dataA6Characteristic?.write(data);
                 },
@@ -193,7 +191,7 @@ class _ProbeBoxDevicePageState extends State<ProbeBoxDevicePage> {
               OperateBtnWidget(
                 onPressed: () async {
                   final unitI = (unit == ElinkTemperatureUnit.celsius ? ElinkTemperatureUnit.fahrenheit : ElinkTemperatureUnit.celsius).index;
-                  final data = await _elinkProbeSendCmdUtils.switchUnitBox(unitI);
+                  final data = await _elinkProbeBoxSendCmdUtils.switchUnit(unitI);
                   _addLog('switchUnit: ${data.toHex()}');
                   _dataA7Characteristic?.write(data);
                 },
@@ -206,7 +204,7 @@ class _ProbeBoxDevicePageState extends State<ProbeBoxDevicePage> {
                     _showInfo();
                     return;
                   }
-                  final data = await _elinkProbeSendCmdUtils.clearBoxProbeInfo(mac);
+                  final data = await _elinkProbeBoxSendCmdUtils.clearBoxProbeInfo(mac);
                   _addLog('clearProbeInfo: ${data.toHex()}');
                   _dataA7Characteristic?.write(data);
                 },
@@ -243,7 +241,7 @@ class _ProbeBoxDevicePageState extends State<ProbeBoxDevicePage> {
                     alarmTempCelsius: 35,
                     alarmTempFahrenheit: 95,
                   );
-                  final data = await _elinkProbeSendCmdUtils.setBoxProbeInfo(probeInfo);
+                  final data = await _elinkProbeBoxSendCmdUtils.setBoxProbeInfo(probeInfo);
                   _addLog('setProbeInfo: ${data.toHex()}');
                   _dataA7Characteristic?.write(data, allowLongWrite: true);
                 },
@@ -256,7 +254,7 @@ class _ProbeBoxDevicePageState extends State<ProbeBoxDevicePage> {
                     _showInfo();
                     return;
                   }
-                  final data = await _elinkProbeSendCmdUtils.getBoxProbeInfo(mac);
+                  final data = await _elinkProbeBoxSendCmdUtils.getBoxProbeInfo(mac);
                   _addLog('getProbeInfo: ${data.toHex()}');
                   _dataA7Characteristic?.write(data);
                 },
@@ -365,9 +363,9 @@ class _ProbeBoxDevicePageState extends State<ProbeBoxDevicePage> {
   void _addLog(String log) {
     if (mounted) {
       setState(() {
-        logList.add(log);
+        logList.insert(0, log);
       });
-      _scrollToBottom();
+      // _scrollToBottom();
     }
   }
 

@@ -83,7 +83,7 @@ class _ProbeDevicePageState extends State<ProbeDevicePage> {
     }, onSetResult: (setResult) {
       _addLog('onSetResult: $setResult');
     }, onSwitchUnit: (setResult) {
-      _addLog('onSwitchUnit: $setResult');
+      _addLog('onSwitchUnit: $setResult, $unit');
       if (setResult == ElinkSetResult.success) {
         setState(() {
           unit = unit == ElinkTemperatureUnit.celsius ? ElinkTemperatureUnit.fahrenheit : ElinkTemperatureUnit.celsius;
@@ -298,18 +298,9 @@ class _ProbeDevicePageState extends State<ProbeDevicePage> {
   void _addLog(String log) {
     if (mounted) {
       setState(() {
-        logList.add(log);
+        logList.insert(0, log);
       });
-      _scrollToBottom();
     }
-  }
-
-  void _scrollToBottom() {
-    _controller.animateTo(
-      _controller.position.maxScrollExtent,
-      duration: const Duration(milliseconds: 500),
-      curve: Curves.easeInOut,
-    );
   }
 
   @override
