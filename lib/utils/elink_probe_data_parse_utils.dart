@@ -4,7 +4,9 @@ import 'package:ailink_food_probe/model/elink_probe_info.dart';
 import 'package:ailink_food_probe/model/elink_probe_real_time.dart';
 import 'package:ailink_food_probe/utils/elink_probe_a6_data_parse_utils.dart';
 import 'package:ailink_food_probe/utils/elink_probe_a7_data_parse_utils.dart';
+import 'package:ailink_food_probe/utils/elink_probe_box_parse_callback.dart';
 import 'package:ailink_food_probe/utils/elink_probe_config.dart';
+import 'package:ailink_food_probe/utils/elink_probe_parse_callback.dart';
 import 'package:flutter/foundation.dart';
 
 typedef OnGetVersion = Function(String version);
@@ -55,7 +57,32 @@ class ElinkProbeDataParseUtils {
   OnGetProbeInfoFailure? onGetProbeInfoFailure;
   OnGetProbeBoxInfo? onGetProbeChargingBoxInfo;
 
-  setCallback({
+  void setProbeCallback(
+    ElinkProbeParseCallback callback
+  ) {
+    onGetVersion = callback.onGetVersion;
+    onGetBattery = callback.onGetBattery;
+    onSetResult = callback.onSetResult;
+    onSwitchUnit = callback.onSwitchUnit;
+    onGetRealTimeData = callback.onGetRealTimeData;
+    onGetProbeInfo = callback.onGetProbeInfo;
+    onGetProbeInfoFailure = callback.onGetProbeInfoFailure;
+  }
+
+  void setProbeBoxCallback(
+    ElinkProbeBoxParseCallback callback
+  ) {
+    onGetVersion = callback.onGetVersion;
+    onRequestSyncTime = callback.onRequestSyncTime;
+    onSetResult = callback.onSetResult;
+    onSyncTimeResult = callback.onSyncTimeResult;
+    onSwitchUnit = callback.onSwitchUnit;
+    onGetProbeChargingBoxInfo = callback.onGetProbeChargingBoxInfo;
+    onGetProbeInfo = callback.onGetProbeInfo;
+  }
+
+  @Deprecated('Please use setProbeCallback & setProbeBoxCallback instead')
+  void setCallback({
     OnGetVersion? onGetVersion,
     VoidCallback? onRequestSyncTime,
     OnSetResult? onSetResult,

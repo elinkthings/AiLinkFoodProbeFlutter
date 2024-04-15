@@ -10,6 +10,7 @@ import 'package:ailink_food_probe/model/elink_probe_info.dart';
 import 'package:ailink_food_probe/utils/elink_probe_cmd_utils.dart';
 import 'package:ailink_food_probe/utils/elink_probe_config.dart';
 import 'package:ailink_food_probe/utils/elink_probe_data_parse_utils.dart';
+import 'package:ailink_food_probe/utils/elink_probe_parse_callback.dart';
 import 'package:ailink_food_probe_example/model/connect_device_model.dart';
 import 'package:ailink_food_probe_example/utils/extensions.dart';
 import 'package:ailink_food_probe_example/widgets/widget_ble_state.dart';
@@ -76,26 +77,33 @@ class _ProbeDevicePageState extends State<ProbeDevicePage> {
     _bluetoothDevice = connectDeviceModel.device;
     _elinkProbeSendCmdUtils = ElinkProbeCmdUtils(connectDeviceModel.bleData.macArr);
     _elinkProbeDataParseUtils = ElinkProbeDataParseUtils(connectDeviceModel.bleData.macArr);
-    _elinkProbeDataParseUtils.setCallback(onGetVersion: (version) {
-      _addLog('onGetVersion: $version');
-    }, onGetBattery: (state, battery) {
-      _addLog('onGetBattery: $state, $battery');
-    }, onSetResult: (setResult) {
-      _addLog('onSetResult: $setResult');
-    }, onSwitchUnit: (setResult) {
-      _addLog('onSwitchUnit: $setResult, $unit');
-      if (setResult == ElinkSetResult.success) {
-        setState(() {
-          unit = unit == ElinkTemperatureUnit.celsius ? ElinkTemperatureUnit.fahrenheit : ElinkTemperatureUnit.celsius;
-        });
-      }
-    }, onGetRealTimeData: (realTimeModel) {
-      _addLog('onGetRealTimeData: ${realTimeModel.toFormatString()}');
-    }, onGetProbeInfo: (probeInfo) {
-      _addLog('onGetProbeInfo: $probeInfo');
-    }, onGetProbeInfoFailure: (mac) {
-      _addLog('onGetProbeInfoFailure: ${ElinkBroadcastDataUtils.littleBytes2MacStr(mac)}');
-    });
+    _elinkProbeDataParseUtils.setProbeCallback(ElinkProbeParseCallback(
+        onGetVersion: (version) {
+          _addLog('onGetVersion: $version');
+        }, onGetBattery: (state, battery) {
+          _addLog('onGetBattery: $state, $battery');
+        }, onSetResult: (setResult) {
+          _addLog('onSetResult: $setResult');
+        }, onSwitchUnit: (setResult) {
+          _addLog('onSwitchUnit: $setResult, $unit');
+          if (setResult == ElinkSetResult.success) {
+            setState(() {
+              unit = unit == ElinkTemperatureUnit.celsius ? ElinkTemperatureUnit.fahrenheit : ElinkTemperatureUnit.celsius;
+            });
+          }
+        }, onGetRealTimeData: (realTimeModel) {
+          _addLog('onGetRealTimeData: ${realTimeModel.toFormatString()}');
+          if (unit != ElinkTemperatureUnit.values[realTimeModel.realTimeUnit]) {
+            setState(() {
+              unit = ElinkTemperatureUnit.values[realTimeModel.realTimeUnit];
+            });
+          }
+        }, onGetProbeInfo: (probeInfo) {
+          _addLog('onGetProbeInfo: $probeInfo');
+        }, onGetProbeInfoFailure: (mac) {
+          _addLog('onGetProbeInfoFailure: ${ElinkBroadcastDataUtils.littleBytes2MacStr(mac)}');
+        }
+    ));
   }
 
   @override
@@ -167,8 +175,9 @@ class _ProbeDevicePageState extends State<ProbeDevicePage> {
               OperateBtnWidget(
                 onPressed: () {
                   final deviceModel = ModalRoute.of(context)?.settings.arguments as ConnectDeviceModel;
+                  final time = DateTime.now().millisecondsSinceEpoch;
                   final probeInfo = ElinkProbeInfo(mac: deviceModel.bleData.macArr,
-                      id: 1708568881612, foodType: 0,
+                      id: time, foodType: 0,
                       foodRawness: 2, targetTempCelsius: 1,
                       targetTempFahrenheit: 149,
                       lowerTempLimitCelsius: 0,
@@ -177,8 +186,8 @@ class _ProbeDevicePageState extends State<ProbeDevicePage> {
                       upperTempLimitFahrenheit: 212,
                       alarmTempPercent: 0.8,
                       currentUnit: unit.index,
-                      timerStart: 1708568881612,
-                      timerEnd: 1708568881612,
+                      timerStart: time,
+                      timerEnd: time,
                   );
                   final data = _elinkProbeSendCmdUtils.setProbeInfo(probeInfo);
                   _addLog('SetProbeInfo: ${data.toHex()}');

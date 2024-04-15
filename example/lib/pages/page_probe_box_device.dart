@@ -8,6 +8,7 @@ import 'package:ailink/utils/elink_broadcast_data_utils.dart';
 import 'package:ailink/utils/elink_cmd_utils.dart';
 import 'package:ailink_food_probe/model/elink_probe_box_info.dart';
 import 'package:ailink_food_probe/model/elink_probe_info.dart';
+import 'package:ailink_food_probe/utils/elink_probe_box_parse_callback.dart';
 import 'package:ailink_food_probe/utils/elink_probe_config.dart';
 import 'package:ailink_food_probe/utils/elink_probe_data_parse_utils.dart';
 import 'package:ailink_food_probe/utils/elink_probe_box_cmd_utils.dart';
@@ -83,32 +84,39 @@ class _ProbeBoxDevicePageState extends State<ProbeBoxDevicePage> {
     _bluetoothDevice = connectDeviceModel.device;
     _elinkProbeBoxSendCmdUtils = ElinkProbeBoxCmdUtils(connectDeviceModel.bleData.macArr);
     _elinkProbeDataParseUtils = ElinkProbeDataParseUtils(connectDeviceModel.bleData.macArr);
-    _elinkProbeDataParseUtils.setCallback(onGetVersion: (version) {
-      _addLog('onGetVersion: $version');
-    }, onRequestSyncTime: () {
-      _addLog('onRequestSyncTime');
-    }, onSetResult: (setResult) {
-      _addLog('onSetResult: $setResult');
-    }, onSyncTimeResult: (syncResult) {
-      _addLog('onSyncTimeResult: $syncResult');
-    }, onSwitchUnit: (setResult) {
-      _addLog('onSwitchUnit: $setResult');
-      if (setResult == ElinkSetResult.success) {
-        setState(() {
-          unit = unit == ElinkTemperatureUnit.celsius ? ElinkTemperatureUnit.fahrenheit : ElinkTemperatureUnit.celsius;
-        });
-      }
-    }, onGetProbeChargingBoxInfo: (supportNum, currentNum, boxChargingState, boxBattery, boxUnit, probeList) {
-      LogUtils().log('onGetProbeChargingBoxInfo: supportNum: $supportNum, currentNum: $currentNum, boxChargingState: $boxChargingState, boxBattery: $boxBattery, boxUnit: ${boxUnit.name}, ${probeList.map((e) => e.toFormatString()).join(',')}');
-      // _addLog('onGetProbeChargingBoxInfo: supportNum: $supportNum, currentNum: $currentNum, boxChargingState: $boxChargingState, boxBattery: $boxBattery, boxUnit: ${boxUnit.name}, ${probeList.map((e) => e.toFormatString()).join(',')}');
-      if (probeInfoList.isEmpty) {
-        setState(() {
-          probeInfoList.addAll(probeList);
-        });
-      }
-    }, onGetProbeInfo: (probeInfo) {
-      LogUtils().log('onGetProbeInfo: $probeInfo');
-    });
+    _elinkProbeDataParseUtils.setProbeBoxCallback(ElinkProbeBoxParseCallback(
+        onGetVersion: (version) {
+          _addLog('onGetVersion: $version');
+        }, onRequestSyncTime: () {
+          _addLog('onRequestSyncTime');
+        }, onSetResult: (setResult) {
+          _addLog('onSetResult: $setResult');
+        }, onSyncTimeResult: (syncResult) {
+          _addLog('onSyncTimeResult: $syncResult');
+        }, onSwitchUnit: (setResult) {
+          _addLog('onSwitchUnit: $setResult, $unit');
+          if (setResult == ElinkSetResult.success) {
+            setState(() {
+              unit = unit == ElinkTemperatureUnit.celsius ? ElinkTemperatureUnit.fahrenheit : ElinkTemperatureUnit.celsius;
+            });
+          }
+        }, onGetProbeChargingBoxInfo: (supportNum, currentNum, boxChargingState, boxBattery, boxUnit, probeList) {
+          // LogUtils().log('onGetProbeChargingBoxInfo: supportNum: $supportNum, currentNum: $currentNum, boxChargingState: $boxChargingState, boxBattery: $boxBattery, boxUnit: ${boxUnit.name}, ${probeList.map((e) => e.toFormatString()).join(',')}');
+          _addLog('onGetProbeChargingBoxInfo: supportNum: $supportNum, currentNum: $currentNum, boxChargingState: $boxChargingState, boxBattery: $boxBattery, boxUnit: ${boxUnit.name}, ${probeList.map((e) => e.toFormatString()).join(',')}');
+          if (unit != boxUnit) {
+            setState(() {
+              unit = boxUnit;
+            });
+          }
+          if (probeInfoList.isEmpty) {
+            setState(() {
+              probeInfoList.addAll(probeList);
+            });
+          }
+        }, onGetProbeInfo: (probeInfo) {
+          LogUtils().log('onGetProbeInfo: $probeInfo');
+        }
+    ));
   }
 
   void _showInfo({
