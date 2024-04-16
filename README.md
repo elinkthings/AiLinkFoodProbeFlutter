@@ -123,6 +123,31 @@ AiLink probe and probe box protocol data processing Flutter library.
     final cmd = elinkProbeCmdUtils.clearProbeInfo();
 ```
 
+### Probe Command callback
+##### ElinkProbeParseCallback
+```dart
+    import 'package:ailink_food_probe/utils/elink_probe_data_parse_utils.dart';
+    import 'package:ailink_food_probe/utils/elink_probe_parse_callback.dart';
+
+    List<int> probeMac;
+    final elinkProbeDataParseUtils = ElinkProbeDataParseUtils(probeMac);
+    final probeCallback = ElinkProbeParseCallback(
+        onGetVersion: (version) {}, 
+        onGetBattery: (state, battery) {}, 
+        onSetResult: (setResult) {}, 
+        onSwitchUnit: (setResult) {}, 
+        onGetRealTimeData: (realTimeModel) {}, 
+        onGetProbeInfo: (probeInfo) {}, 
+        onGetProbeInfoFailure: (mac) {}
+    );
+    elinkProbeDataParseUtils.setProbeCallback(probeCallback);
+
+    ///After discovering the service, determine the characteristic value UUID to be ElinkBleCommonUtils.elinkWriteAndNotifyUuid or ElinkBleCommonUtils.elinkNotifyUuid
+    characteristic.onValueReceived.listen((data) {
+      elinkProbeDataParseUtils.parseElinkData(data);
+    }
+```
+
 ### Probe Box Command Related
 #### ElinkProbeBoxCmdUtils
 ```dart
@@ -158,6 +183,32 @@ AiLink probe and probe box protocol data processing Flutter library.
 ```dart
     List<int> probeMac;
     final cmd = elinkProbeBoxCmdUtils.clearBoxProbeInfo(probeMac);
+```
+
+### Probe box command callback
+##### ElinkProbeBoxParseCallback
+```dart
+    import 'package:ailink_food_probe/utils/elink_probe_data_parse_utils.dart';
+    import 'package:ailink_food_probe/utils/elink_probe_box_parse_callback.dart';
+
+    List<int> probeBoxMac;
+    final elinkProbeDataParseUtils = ElinkProbeDataParseUtils(probeBoxMac);
+    
+    final boxCallback = ElinkProbeBoxParseCallback(
+        onGetVersion: (version) {},
+        onRequestSyncTime: () {},
+        onSetResult: (setResult) {},
+        onSyncTimeResult: (syncResult) {},
+        onSwitchUnit: (setResult) {},
+        onGetProbeChargingBoxInfo: (supportNum, currentNum, boxChargingState, boxBattery, boxUnit, probeList) {},
+        onGetProbeInfo: (probeInfo) {}
+    );
+    elinkProbeDataParseUtils.setProbeBoxCallback(boxCallback);
+
+    ///After discovering the service, determine the characteristic value UUID to be ElinkBleCommonUtils.elinkWriteAndNotifyUuid or ElinkBleCommonUtils.elinkNotifyUuid
+    characteristic.onValueReceived.listen((data) {
+      elinkProbeDataParseUtils.parseElinkData(data);
+    }
 ```
 
 For specific usage, please see example
