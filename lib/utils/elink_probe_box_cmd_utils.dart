@@ -21,12 +21,16 @@ class ElinkProbeBoxCmdUtils extends ElinkProbeBaseCmdUtils {
   }
 
   /// 获取盒子信息
+  /// 使用UUID(elinkWriteUuid: FFE1)的特征值写入
+  /// Write using the characteristic value of UUID(elinkWriteUuid: FFE1)
   Future<List<int>> getBoxDeviceInfo() {
     final payload = List.filled(2, 0x01);
     return getElinkA7Data(payload);
   }
 
   /// 盒子获取探针信息
+  /// 使用UUID(elinkWriteUuid: FFE1)的特征值写入
+  /// Write using the characteristic value of UUID(elinkWriteUuid: FFE1)
   Future<List<int>> getBoxProbeInfo(List<int> probeMac) {
     final payload = List.filled(8, 0x00);
     payload[0] = 0x03;
@@ -36,6 +40,8 @@ class ElinkProbeBoxCmdUtils extends ElinkProbeBaseCmdUtils {
   }
 
   /// 盒子清除探针信息
+  /// 使用UUID(elinkWriteUuid: FFE1)的特征值写入
+  /// Write using the characteristic value of UUID(elinkWriteUuid: FFE1)
   Future<List<int>> clearBoxProbeInfo(List<int> probeMac) {
     final payload = List.filled(8, 0x00);
     payload[0] = 0x03;
@@ -44,6 +50,8 @@ class ElinkProbeBoxCmdUtils extends ElinkProbeBaseCmdUtils {
   }
 
   /// 盒子设置探针信息
+  /// 使用UUID(elinkWriteUuid: FFE1)的特征值写入
+  /// Write using the characteristic value of UUID(elinkWriteUuid: FFE1)
   Future<List<int>> setBoxProbeInfo(ElinkProbeInfo probeInfo) {
     final payload = List.filled(136, 0x00);
     int index = 0;
@@ -127,6 +135,8 @@ class ElinkProbeBoxCmdUtils extends ElinkProbeBaseCmdUtils {
   }
 
   /// 盒子设置报警
+  /// 使用UUID(elinkWriteUuid: FFE1)的特征值写入
+  /// Write using the characteristic value of UUID(elinkWriteUuid: FFE1)
   Future<List<int>> setAmbientAlarm(
     List<int> probeMac, {
     bool? isTimerExpired = true,
@@ -142,6 +152,8 @@ class ElinkProbeBoxCmdUtils extends ElinkProbeBaseCmdUtils {
   }
 
   /// 盒子取消报警
+  /// 使用UUID(elinkWriteUuid: FFE1)的特征值写入
+  /// Write using the characteristic value of UUID(elinkWriteUuid: FFE1)
   Future<List<int>> cancelAmbientAlarm(List<int> probeMac) {
     final payload = List.filled(8, 0xFF);
     payload[0] = 0x07;

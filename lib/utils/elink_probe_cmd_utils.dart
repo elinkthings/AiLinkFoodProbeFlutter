@@ -22,12 +22,16 @@ class ElinkProbeCmdUtils extends ElinkProbeBaseCmdUtils {
   }
 
   /// 获取电量
+  /// 使用UUID(elinkWriteAndNotifyUuid: FFE3)的特征值写入
+  /// Write using the characteristic value of UUID(elinkWriteAndNotifyUuid: FFE3)
   List<int> getBattery() {
     final payload = [0x28];
     return ElinkCmdUtils.getElinkA6Data(payload);
   }
 
   /// 获取设备信息
+  /// 使用UUID(elinkWriteAndNotifyUuid: FFE3)的特征值写入
+  /// Write using the characteristic value of UUID(elinkWriteAndNotifyUuid: FFE3)
   List<int> getProbeInfo() {
     final payload = List.filled(2, 0x01);
     payload[0] = 0x36;
@@ -35,6 +39,8 @@ class ElinkProbeCmdUtils extends ElinkProbeBaseCmdUtils {
   }
 
   /// 开始工作(设置信息)
+  /// 使用UUID(elinkWriteAndNotifyUuid: FFE3)的特征值写入
+  /// Write using the characteristic value of UUID(elinkWriteAndNotifyUuid: FFE3)
   List<int> setProbeInfo(ElinkProbeInfo probeInfo) {
     final payload = List.filled(128, 0x00);
     payload[0] = 0x35;
@@ -78,6 +84,8 @@ class ElinkProbeCmdUtils extends ElinkProbeBaseCmdUtils {
   }
 
   /// 结束工作
+  /// 使用UUID(elinkWriteAndNotifyUuid: FFE3)的特征值写入
+  /// Write using the characteristic value of UUID(elinkWriteAndNotifyUuid: FFE3)
   List<int> clearProbeInfo() {
     final payload = List.filled(2, 0x00);
     payload[0] = 0x35;
