@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:ailink/utils/common_extensions.dart';
 import 'package:ailink/utils/elink_cmd_utils.dart';
 import 'package:ailink_food_probe/model/elink_probe_info.dart';
 import 'package:ailink_food_probe/utils/elink_probe_base_cmd_utils.dart';
@@ -132,6 +135,20 @@ class ElinkProbeBoxCmdUtils extends ElinkProbeBoxBaseCmdUtils {
       payload[index++] = alarmTempFahrenheit[0] | 0x80;
     }
     payload[index++] = alarmTempFahrenheit[1];
+    if (!probeInfo.remark.isNullOrEmpty) {
+      String remark = probeInfo.remark!;
+      List<int> remarkBytes = utf8.encode(remark);
+      if (remarkBytes.length > 32) {
+        while (remarkBytes.length > 29) {
+          remark = remark.substring(0, remark.length - 1);
+          remarkBytes = utf8.encode(remark);
+        }
+        remark = "$remark...";
+        remarkBytes = utf8.encode(remark);
+      }
+      payload.setAll(index, remarkBytes);
+      index += remarkBytes.length;
+    }
     return getElinkA7Data(payload);
   }
 

@@ -114,6 +114,7 @@ class _ProbeBoxDevicePageState extends State<ProbeBoxDevicePage> {
             });
           }
         }, onGetProbeInfo: (probeInfo) {
+          _addLog('onGetProbeInfo: $probeInfo');
           LogUtils().log('onGetProbeInfo: $probeInfo');
         }
     ));
@@ -248,6 +249,7 @@ class _ProbeBoxDevicePageState extends State<ProbeBoxDevicePage> {
                     timerEnd: time,
                     alarmTempCelsius: 35,
                     alarmTempFahrenheit: 95,
+                    remark: 'ProbeBox',
                   );
                   final data = await _elinkProbeBoxSendCmdUtils.setBoxProbeInfo(probeInfo);
                   _addLog('setProbeInfo: ${data.toHex()}');
