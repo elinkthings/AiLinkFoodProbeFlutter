@@ -33,7 +33,7 @@ class ElinkProbeBoxWithScreenCmdUtils extends ElinkProbeBoxBaseCmdUtils {
     return getElinkA7Data(payload);
   }
 
-  /// 盒子设置报警
+  /// 盒子设置环境温度报警
   /// 使用UUID(elinkWriteUuid: FFE1)的特征值写入
   /// Write using the characteristic value of UUID(elinkWriteUuid: FFE1)
   Future<List<int>> setAmbientAlarm(List<int> probeMac) {
@@ -44,6 +44,9 @@ class ElinkProbeBoxWithScreenCmdUtils extends ElinkProbeBoxBaseCmdUtils {
     return getElinkA7Data(payload);
   }
 
+  /// 盒子获取探针信息
+  /// 使用UUID(elinkWriteUuid: FFE1)的特征值写入
+  /// Write using the characteristic value of UUID(elinkWriteUuid: FFE1)
   Future<List<int>> getProbeInfo() {
     final payload = List.filled(2, 0x01);
     payload[0] = 0x09;

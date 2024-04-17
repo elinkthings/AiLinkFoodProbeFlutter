@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:ailink/utils/common_extensions.dart';
 import 'package:ailink/utils/elink_cmd_utils.dart';
 import 'package:ailink_food_probe/model/elink_probe_info.dart';
-import 'package:ailink_food_probe/utils/elink_probe_base_cmd_utils.dart';
 import 'package:ailink_food_probe/utils/elink_probe_box_base_cmd_utils.dart';
 import 'package:ailink_food_probe/utils/elink_probe_config.dart';
 
@@ -152,7 +151,7 @@ class ElinkProbeBoxCmdUtils extends ElinkProbeBoxBaseCmdUtils {
     return getElinkA7Data(payload);
   }
 
-  /// 盒子设置报警
+  /// 盒子设置环境温度报警
   /// 使用UUID(elinkWriteUuid: FFE1)的特征值写入
   /// Write using the characteristic value of UUID(elinkWriteUuid: FFE1)
   Future<List<int>> setAmbientAlarm(List<int> probeMac, {
