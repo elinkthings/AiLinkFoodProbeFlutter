@@ -1,4 +1,4 @@
-# ailink
+# ailink_food_probe
 
 ##[English](README.md)
 
@@ -202,6 +202,72 @@ AiLink探针和探针盒子协议数据处理Flutter库.
         onSwitchUnit: (setResult) {},
         onGetProbeChargingBoxInfo: (supportNum, currentNum, boxChargingState, boxBattery, boxUnit, probeList) {},
         onGetProbeInfo: (probeInfo) {}
+    );
+    elinkProbeDataParseUtils.setProbeBoxCallback(boxCallback);
+
+    ///发现服务后判断特征值UUID为ElinkBleCommonUtils.elinkWriteAndNotifyUuid或ElinkBleCommonUtils.elinkNotifyUuid
+    characteristic.onValueReceived.listen((data) {
+      elinkProbeDataParseUtils.parseElinkData(data);
+    }
+```
+
+### 探针盒子带屏指令相关
+##### ElinkProbeBoxWithScreenCmdUtils
+```dart
+    import 'package:ailink_food_probe/utils/elink_probe_box_with_screen_cmd_utils.dart';
+    List<int> probeBoxMac;
+    final elinkProbeBoxWithScreenCmdUtils = ElinkProbeBoxWithScreenCmdUtils(probeBoxMac);
+```
+1. 获取版本信息:
+```dart
+    final cmd = elinkProbeBoxWithScreenCmdUtils.getVersion();
+```
+2. 同步时间:
+```dart 
+    final cmd = elinkProbeBoxWithScreenCmdUtils.syncTime(dateTime);
+```
+3. 切换单位:
+```dart
+    final cmd = elinkProbeBoxWithScreenCmdUtils.switchUnit(unit); //0: °C, 1: °F
+```
+4. 获取探针数据(根据探针的mac地址):
+```dart
+    List<int> probeMac;
+    final cmd = elinkProbeBoxWithScreenCmdUtils.getProbeInfo();
+```
+5. 设置探针数据(探针数据中目前仅有报警温度设备端有处理，其它数据都未处理):
+```dart
+    import 'package:ailink_food_probe/model/elink_probe_info.dart';
+
+    ElinkProbeInfo probeInfo;
+    final cmd = elinkProbeBoxWithScreenCmdUtils.setBoxProbeInfo(probeInfo);
+```
+6. 清除探针数据(根据探针的mac地址):
+```dart
+    List<int> probeMac;
+    final cmd = elinkProbeBoxWithScreenCmdUtils.clearBoxProbeInfo(probeMac);
+```
+
+### 探针盒子带屏指令回调
+##### ElinkProbeBoxWithScreenParseCallback
+```dart
+    import 'package:ailink_food_probe/utils/elink_probe_data_parse_utils.dart';
+    import 'package:ailink_food_probe/utils/elink_probe_box_with_screen_parse_callback.dart';
+
+    List<int> probeBoxMac;
+    final elinkProbeDataParseUtils = ElinkProbeDataParseUtils(probeBoxMac);
+    
+    final boxCallback = ElinkProbeBoxWithScreenParseCallback(
+        onGetVersion: (version) {}, 
+        onRequestSyncTime: () {}, 
+        onSetResult: (setResult) {}, 
+        onSyncTimeResult: (syncResult) {}, 
+        onSwitchUnit: (setResult) {}, 
+        onGetProbeChargingBoxInfo: (supportNum, connectNum, boxChargingState, boxBattery, boxUnit, probeList) {}, 
+        onGetProbeInfo: (probeInfo) {}, 
+        onGetProbeInfoFailure: (mac) {}, 
+        onCancelAmbientAlarm: (mac, cancel) {}, 
+        onEndWorkByBox: (mac) {},
     );
     elinkProbeDataParseUtils.setProbeBoxCallback(boxCallback);
 

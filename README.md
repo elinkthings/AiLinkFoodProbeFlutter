@@ -1,4 +1,4 @@
-# ailink
+# ailink_food_probe
 
 ##[中文](README_CN.md)
 
@@ -211,4 +211,69 @@ AiLink probe and probe box protocol data processing Flutter library.
     }
 ```
 
+### Probe Box With Screen Command Related
+##### ElinkProbeBoxWithScreenCmdUtils
+```dart
+    import 'package:ailink_food_probe/utils/elink_probe_box_with_screen_cmd_utils.dart';
+    List<int> probeBoxMac;
+    final elinkProbeBoxWithScreenCmdUtils = ElinkProbeBoxWithScreenCmdUtils(probeBoxMac);
+```
+1. Get version information:
+```dart
+    final cmd = elinkProbeBoxWithScreenCmdUtils.getVersion();
+```
+2. Sync time:
+```dart 
+    final cmd = elinkProbeBoxWithScreenCmdUtils.syncTime(dateTime);
+```
+3. Switch unit:
+```dart
+    final cmd = elinkProbeBoxWithScreenCmdUtils.switchUnit(unit); //0: °C, 1: °F
+```
+4. Get probe data:
+```dart
+    List<int> probeMac;
+    final cmd = elinkProbeBoxWithScreenCmdUtils.getProbeInfo();
+```
+5. Set probe data (only the alarm temperature in the probe data is processed by the device, other data is not processed):
+```dart
+    import 'package:ailink_food_probe/model/elink_probe_info.dart';
+
+    ElinkProbeInfo probeInfo;
+    final cmd = elinkProbeBoxWithScreenCmdUtils.setBoxProbeInfo(probeInfo);
+```
+6. Clear probe data (based on the probe's MAC address):
+```dart
+    List<int> probeMac;
+    final cmd = elinkProbeBoxWithScreenCmdUtils.clearBoxProbeInfo(probeMac);
+```
+
+### Probe box with screen command callback
+##### ElinkProbeBoxWithScreenParseCallback
+```dart
+    import 'package:ailink_food_probe/utils/elink_probe_data_parse_utils.dart';
+    import 'package:ailink_food_probe/utils/elink_probe_box_with_screen_parse_callback.dart';
+
+    List<int> probeBoxMac;
+    final elinkProbeDataParseUtils = ElinkProbeDataParseUtils(probeBoxMac);
+    
+    final boxCallback = ElinkProbeBoxWithScreenParseCallback(
+        onGetVersion: (version) {}, 
+        onRequestSyncTime: () {}, 
+        onSetResult: (setResult) {}, 
+        onSyncTimeResult: (syncResult) {}, 
+        onSwitchUnit: (setResult) {}, 
+        onGetProbeChargingBoxInfo: (supportNum, connectNum, boxChargingState, boxBattery, boxUnit, probeList) {}, 
+        onGetProbeInfo: (probeInfo) {}, 
+        onGetProbeInfoFailure: (mac) {}, 
+        onCancelAmbientAlarm: (mac, cancel) {}, 
+        onEndWorkByBox: (mac) {},
+    );
+    elinkProbeDataParseUtils.setProbeBoxCallback(boxCallback);
+
+    ///发现服务后判断特征值UUID为ElinkBleCommonUtils.elinkWriteAndNotifyUuid或ElinkBleCommonUtils.elinkNotifyUuid
+    characteristic.onValueReceived.listen((data) {
+      elinkProbeDataParseUtils.parseElinkData(data);
+    }
+```
 For specific usage, please see example
