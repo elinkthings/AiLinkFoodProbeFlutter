@@ -5,6 +5,7 @@ import 'package:ailink_food_probe/model/elink_probe_real_time.dart';
 import 'package:ailink_food_probe/utils/elink_probe_a6_data_parse_utils.dart';
 import 'package:ailink_food_probe/utils/elink_probe_a7_data_parse_utils.dart';
 import 'package:ailink_food_probe/utils/elink_probe_box_parse_callback.dart';
+import 'package:ailink_food_probe/utils/elink_probe_box_with_screen_parse_callback.dart';
 import 'package:ailink_food_probe/utils/elink_probe_config.dart';
 import 'package:ailink_food_probe/utils/elink_probe_parse_callback.dart';
 import 'package:flutter/foundation.dart';
@@ -19,12 +20,20 @@ typedef OnGetProbeInfo = Function(ElinkProbeInfo probeInfo);
 typedef OnGetProbeInfoFailure = Function(List<int> mac);
 typedef OnGetProbeBoxInfo = Function(
   int supportNum,
-  int currentNum,
+  int connectNum,
   ElinkChargingState boxChargingState,
   int boxBattery,
   ElinkTemperatureUnit boxUnit,
   List<ElinkProbeBoxInfo> chargingBox,
 );
+typedef OnAlarmResult = Function(
+  List<int> mac,
+  bool isTimeout,
+  bool isAmbientTempHigh,
+  bool isTargetTempReached,
+);
+typedef OnCancelAmbientAlarm = Function(List<int> mac, bool cancel);
+typedef OnEndWorkByBox = Function(List<int> mac);
 
 /// 探针和探针盒子数据处理工具类(Probe and probe box data processing tool class)
 class ElinkProbeDataParseUtils {
@@ -56,6 +65,8 @@ class ElinkProbeDataParseUtils {
   OnGetProbeInfo? onGetProbeInfo;
   OnGetProbeInfoFailure? onGetProbeInfoFailure;
   OnGetProbeBoxInfo? onGetProbeChargingBoxInfo;
+  OnCancelAmbientAlarm? onCancelAmbientAlarm;
+  OnEndWorkByBox? onEndWorkByBox;
 
   void setProbeCallback(
     ElinkProbeParseCallback callback
@@ -79,6 +90,21 @@ class ElinkProbeDataParseUtils {
     onSwitchUnit = callback.onSwitchUnit;
     onGetProbeChargingBoxInfo = callback.onGetProbeChargingBoxInfo;
     onGetProbeInfo = callback.onGetProbeInfo;
+  }
+
+  void setProbeBoxWithScreenCallback(
+    ElinkProbeBoxWithScreenParseCallback callback
+  ) {
+    onGetVersion = callback.onGetVersion;
+    onRequestSyncTime = callback.onRequestSyncTime;
+    onSetResult = callback.onSetResult;
+    onSyncTimeResult = callback.onSyncTimeResult;
+    onSwitchUnit = callback.onSwitchUnit;
+    onGetProbeChargingBoxInfo = callback.onGetProbeChargingBoxInfo;
+    onGetProbeInfo = callback.onGetProbeInfo;
+    onCancelAmbientAlarm = callback.onCancelAmbientAlarm;
+    onEndWorkByBox = callback.onEndWorkByBox;
+    onGetProbeInfoFailure = callback.onGetProbeInfoFailure;
   }
 
   @Deprecated('Please use setProbeCallback & setProbeBoxCallback instead')
@@ -128,6 +154,9 @@ class ElinkProbeDataParseUtils {
           onGetRealTimeData: onGetRealTimeData,
           onGetProbeChargingBoxInfo: onGetProbeChargingBoxInfo,
           onGetProbeInfo: onGetProbeInfo,
+          onGetProbeInfoFailure: onGetProbeInfoFailure,
+          onCancelAmbientAlarm: onCancelAmbientAlarm,
+          onEndWorkByBox: onEndWorkByBox,
         );
       }
     } else {

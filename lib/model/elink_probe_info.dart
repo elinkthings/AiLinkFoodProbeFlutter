@@ -5,13 +5,13 @@ class ElinkProbeInfo {
   /// 探针mac
   List<int> mac = List.filled(5, 0x00);
 
-  /// 探针id
+  /// 烧烤Id（选择食物的时间戳）
   int id = -1;
 
   /// 食物类型
   int foodType = -1;
 
-  /// 食物烤熟成都
+  /// 食物烤熟程度
   int foodRawness = -1;
 
   /// 目标温度(°C)
@@ -20,16 +20,16 @@ class ElinkProbeInfo {
   /// 目标温度(°F)
   int targetTempFahrenheit = 0;
 
-  /// 下限温度(°C)
+  /// 环境下限温度(°C)
   int lowerTempLimitCelsius = 0;
 
-  /// 下限温度(°F)
+  /// 环境下限温度(°F)
   int lowerTempLimitFahrenheit = 0;
 
-  /// 上限温度(°C)
+  /// 环境上限温度(°C)
   int upperTempLimitCelsius = 0;
 
-  /// 上限温度(°F)
+  /// 环境上限温度(°F)
   int upperTempLimitFahrenheit = 0;
 
   /// 提醒温度对目标温度百分比0.8~1 如果获取到的小于0.8则等于0.8，大于1则等于1
@@ -37,6 +37,9 @@ class ElinkProbeInfo {
 
   /// 定时开始时间
   int? timerStart = 0;
+
+  /// 倒计时时间
+  int? timerCountDown = 0;
 
   /// 定时结束时间
   int? timerEnd = 0;
@@ -49,6 +52,15 @@ class ElinkProbeInfo {
 
   /// 报警温度(°F)
   int? alarmTempFahrenheit = 0;
+
+  /// 发送的自定义备注
+  String? remark;
+
+  /// 任务运行时间(带屏)
+  int? workTime = 0;
+
+  /// 任务状态 0x00-未开始 0x01-已开始
+  int? workState = 0;
 
   ElinkProbeInfo({
     required this.mac,
@@ -63,15 +75,19 @@ class ElinkProbeInfo {
     required this.upperTempLimitFahrenheit,
     this.alarmTempPercent,
     this.timerStart,
+    this.timerCountDown,
     this.timerEnd,
     required this.currentUnit,
     this.alarmTempCelsius,
     this.alarmTempFahrenheit,
+    this.remark,
+    this.workTime,
+    this.workState,
   });
 
   @override
   String toString() {
-    return 'ElinkSetProbeInfoModel{mac: ${ElinkBroadcastDataUtils.littleBytes2MacStr(mac)}, id: $id, foodType: $foodType, foodRawness: $foodRawness, targetTempCelsius: $targetTempCelsius, targetTempFahrenheit: $targetTempFahrenheit, lowerTempLimitCelsius: $lowerTempLimitCelsius, lowerTempLimitFahrenheit: $lowerTempLimitFahrenheit, upperTempLimitCelsius: $upperTempLimitCelsius, upperTempLimitFahrenheit: $upperTempLimitFahrenheit, alarmTempPercent: $alarmTempPercent, timerStart: $timerStart, timerEnd: $timerEnd, currentUnit: $currentUnit, alarmTempCelsius: $alarmTempCelsius, alarmTempFahrenheit: $alarmTempFahrenheit}';
+    return 'ElinkSetProbeInfoModel{mac: ${ElinkBroadcastDataUtils.littleBytes2MacStr(mac)}, id: $id, foodType: $foodType, foodRawness: $foodRawness, targetTempCelsius: $targetTempCelsius, targetTempFahrenheit: $targetTempFahrenheit, lowerTempLimitCelsius: $lowerTempLimitCelsius, lowerTempLimitFahrenheit: $lowerTempLimitFahrenheit, upperTempLimitCelsius: $upperTempLimitCelsius, upperTempLimitFahrenheit: $upperTempLimitFahrenheit, alarmTempPercent: $alarmTempPercent, timerStart: $timerStart, timerCountDown: $timerCountDown, timerEnd: $timerEnd, currentUnit: $currentUnit, alarmTempCelsius: $alarmTempCelsius, alarmTempFahrenheit: $alarmTempFahrenheit, remark: $remark, workTime: $workTime, workState: $workState}';
   }
 
   int get alarmTempC => alarmTempCelsius ?? 0;

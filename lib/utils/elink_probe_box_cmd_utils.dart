@@ -1,10 +1,11 @@
 import 'package:ailink/utils/elink_cmd_utils.dart';
 import 'package:ailink_food_probe/model/elink_probe_info.dart';
 import 'package:ailink_food_probe/utils/elink_probe_base_cmd_utils.dart';
+import 'package:ailink_food_probe/utils/elink_probe_box_base_cmd_utils.dart';
 import 'package:ailink_food_probe/utils/elink_probe_config.dart';
 
 /// 探针盒子命令工具类(Probe box command tool class)
-class ElinkProbeBoxCmdUtils extends ElinkProbeBaseCmdUtils {
+class ElinkProbeBoxCmdUtils extends ElinkProbeBoxBaseCmdUtils {
   static ElinkProbeBoxCmdUtils? _instance;
 
   ElinkProbeBoxCmdUtils._() {
@@ -137,8 +138,7 @@ class ElinkProbeBoxCmdUtils extends ElinkProbeBaseCmdUtils {
   /// 盒子设置报警
   /// 使用UUID(elinkWriteUuid: FFE1)的特征值写入
   /// Write using the characteristic value of UUID(elinkWriteUuid: FFE1)
-  Future<List<int>> setAmbientAlarm(
-    List<int> probeMac, {
+  Future<List<int>> setAmbientAlarm(List<int> probeMac, {
     bool? isTimerExpired = true,
     bool? isHighAmbientTemp = true,
     bool? isTargetTempReached = true,
@@ -148,16 +148,6 @@ class ElinkProbeBoxCmdUtils extends ElinkProbeBaseCmdUtils {
     payload.insertAll(1, probeMac);
     final alarmState = ((isTimerExpired == true ? 0x01 : 0x00) | ((isHighAmbientTemp == true ? 0x01 : 0x00) << 1) | ((isTargetTempReached == true ? 0x01 : 0x00) << 2)) & 0xFF;
     payload[7] = alarmState;
-    return getElinkA7Data(payload);
-  }
-
-  /// 盒子取消报警
-  /// 使用UUID(elinkWriteUuid: FFE1)的特征值写入
-  /// Write using the characteristic value of UUID(elinkWriteUuid: FFE1)
-  Future<List<int>> cancelAmbientAlarm(List<int> probeMac) {
-    final payload = List.filled(8, 0xFF);
-    payload[0] = 0x07;
-    payload.insertAll(1, probeMac);
     return getElinkA7Data(payload);
   }
 }
