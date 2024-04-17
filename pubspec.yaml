@@ -1,7 +1,7 @@
 name: ailink_food_probe
 description: AiLink Probe and Probe Box Protocol Data Processing.
-version: 0.0.2
-homepage: https://github.com/elinkthings/AiLinkFoodProbeFlutter.git
+version: 0.0.3
+homepage: https://github.com/elinkthings/AiLinkFoodProbeFlutter
 
 environment:
   sdk: '>=3.0.6 <4.0.0'
@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   plugin_platform_interface: ^2.0.2
-  ailink: ^0.0.5
+  ailink: ^0.0.8
 
 dev_dependencies:
   flutter_test:

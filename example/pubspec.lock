@@ -5,17 +5,17 @@ packages:
     dependency: "direct main"
     description:
       name: ailink
-      sha256: "7562399e2a97ad65d173f632d069d181b54238e4a1534285e8c5743d2e66bae4"
+      sha256: "0c12ce96ae105ac2f88ff5c0e761c23c193d3f9f554a45ff589ded8f90d6be49"
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.5"
+    version: "0.0.8"
   ailink_food_probe:
     dependency: "direct main"
     description:
       path: ".."
       relative: true
     source: path
-    version: "0.0.1"
+    version: "0.0.3"
   async:
     dependency: transitive
     description:
