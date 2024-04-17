@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:ailink/ailink.dart';
@@ -211,13 +212,14 @@ class ElinkProbeA7DataParseUtils {
       final currentUnit = decrypted[index++] & 0xFF;
       final alarmTempCelsius = ElinkCmdUtils.bytesToInt(decrypted.sublist(index, index += 2));
       final alarmTempFahrenheit = ElinkCmdUtils.bytesToInt(decrypted.sublist(index, index += 2));
+      final remark = utf8.decode(decrypted.sublist(index, index += 32));
       final model = ElinkProbeInfo(
           mac: mac, id: id, foodType: foodType, foodRawness: foodRawness, targetTempCelsius: targetTempCelsius,
           targetTempFahrenheit: targetTempFahrenheit, lowerTempLimitCelsius: lowerTempLimitCelsius,
           lowerTempLimitFahrenheit: lowerTempLimitFahrenheit, upperTempLimitCelsius: upperTempLimitCelsius,
           upperTempLimitFahrenheit: upperTempLimitFahrenheit, currentUnit: currentUnit,
           alarmTempPercent: alarmTempPercent, timerStart: timerStart, timerEnd: timerEnd,
-          alarmTempCelsius: alarmTempCelsius, alarmTempFahrenheit: alarmTempFahrenheit
+          alarmTempCelsius: alarmTempCelsius, alarmTempFahrenheit: alarmTempFahrenheit, remark: remark,
       );
       onGetProbeInfo?.call(model);
     }
@@ -277,7 +279,7 @@ class ElinkProbeA7DataParseUtils {
       final alarmTempCelsius = (targetTempCelsius * alarmTempPercent).round();
       final alarmTempFahrenheit = (targetTempFahrenheit * alarmTempPercent).round();
       final foodRawness = decrypted[index++] & 0xFF;
-      final remark = String.fromCharCodes(decrypted.sublist(index, index += 32));
+      final remark = utf8.decode(decrypted.sublist(index, index += 32));
       final model = ElinkProbeInfo(
         mac: mac,
         id: cookId,
