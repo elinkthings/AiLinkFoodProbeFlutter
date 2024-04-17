@@ -208,7 +208,13 @@ class _HomePageState extends State<HomePage> {
         InkWell(
           onTap: () {
             FlutterBluePlus.stopScan();
-            Navigator.pushNamed(context, ElinkProbeConfig.isCidProbe(bleData.cidArr) ? page_probe_devce : page_probe_box_device, arguments: ConnectDeviceModel(device: device, bleData: bleData));
+            String page = page_probe_devce;
+            if (ElinkProbeConfig.isCidProbeBox(bleData.cidArr)) {
+              page = page_probe_box_device;
+            } else if (ElinkProbeConfig.isCidProbeBoxWithScreen(bleData.cidArr)) {
+              page = page_probe_box_with_screen_device;
+            }
+            Navigator.pushNamed(context, page, arguments: ConnectDeviceModel(device: device, bleData: bleData));
           },
           child: Container(
             color: Colors.black,

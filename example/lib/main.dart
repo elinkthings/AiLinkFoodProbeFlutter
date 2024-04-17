@@ -1,4 +1,5 @@
 import 'package:ailink_food_probe_example/pages/page_probe_box_device.dart';
+import 'package:ailink_food_probe_example/pages/page_probe_box_with_screen_device.dart';
 import 'package:ailink_food_probe_example/pages/page_probe_device.dart';
 import 'package:ailink_food_probe_example/utils/constants.dart';
 import 'package:ailink_food_probe_example/pages/page_home.dart';
@@ -12,6 +13,7 @@ void main() {
     routes: {
       page_home: (context) => const HomePage(),
       page_probe_box_device: (context) => const ProbeBoxDevicePage(),
+      page_probe_box_with_screen_device: (context) => const ProbeBoxWithScreenDevicePage(),
       page_probe_devce: (context) => const ProbeDevicePage(),
     },
   ));

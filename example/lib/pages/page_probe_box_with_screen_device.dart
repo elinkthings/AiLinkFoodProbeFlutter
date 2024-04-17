@@ -9,9 +9,10 @@ import 'package:ailink/utils/elink_cmd_utils.dart';
 import 'package:ailink_food_probe/model/elink_probe_box_info.dart';
 import 'package:ailink_food_probe/model/elink_probe_info.dart';
 import 'package:ailink_food_probe/utils/elink_probe_box_parse_callback.dart';
+import 'package:ailink_food_probe/utils/elink_probe_box_with_screen_parse_callback.dart';
 import 'package:ailink_food_probe/utils/elink_probe_config.dart';
 import 'package:ailink_food_probe/utils/elink_probe_data_parse_utils.dart';
-import 'package:ailink_food_probe/utils/elink_probe_box_cmd_utils.dart';
+import 'package:ailink_food_probe/utils/elink_probe_box_with_screen_cmd_utils.dart';
 import 'package:ailink_food_probe_example/model/connect_device_model.dart';
 import 'package:ailink_food_probe_example/utils/extensions.dart';
 import 'package:ailink_food_probe_example/utils/log_utils.dart';
@@ -20,15 +21,15 @@ import 'package:ailink_food_probe_example/widgets/widget_operate_btn.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
-/// Probe charging box device(探针充电盒子设备)
-class ProbeBoxDevicePage extends StatefulWidget {
-  const ProbeBoxDevicePage({super.key});
+/// Probe charging box with screen device(探针充电带屏盒子设备)
+class ProbeBoxWithScreenDevicePage extends StatefulWidget {
+  const ProbeBoxWithScreenDevicePage({super.key});
 
   @override
-  State<ProbeBoxDevicePage> createState() => _ProbeBoxDevicePageState();
+  State<ProbeBoxWithScreenDevicePage> createState() => _ProbeBoxWithScreenDeviceState();
 }
 
-class _ProbeBoxDevicePageState extends State<ProbeBoxDevicePage> {
+class _ProbeBoxWithScreenDeviceState extends State<ProbeBoxWithScreenDevicePage> {
   final logList = <String>[];
   final probeInfoList = <ElinkProbeBoxInfo>[];
   ElinkProbeBoxInfo? selectProbeInfo;
@@ -45,7 +46,7 @@ class _ProbeBoxDevicePageState extends State<ProbeBoxDevicePage> {
   BluetoothCharacteristic? _dataA7Characteristic;
   BluetoothCharacteristic? _dataA6Characteristic;
 
-  late ElinkProbeBoxCmdUtils _elinkProbeBoxSendCmdUtils;
+  late ElinkProbeBoxWithScreenCmdUtils _elinkProbeBoxSendCmdUtils;
   late ElinkProbeDataParseUtils _elinkProbeDataParseUtils;
 
   @override
@@ -55,8 +56,7 @@ class _ProbeBoxDevicePageState extends State<ProbeBoxDevicePage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _addLog('addPostFrameCallback');
       _init();
-      _connectionStateSubscription =
-          _bluetoothDevice?.connectionState.listen((state) {
+      _connectionStateSubscription = _bluetoothDevice?.connectionState.listen((state) {
         if (state.isConnected) {
           _addLog('Connected');
           _bluetoothDevice?.discoverServices().then((services) {
@@ -79,12 +79,11 @@ class _ProbeBoxDevicePageState extends State<ProbeBoxDevicePage> {
   }
 
   void _init() {
-    final connectDeviceModel =
-        ModalRoute.of(context)?.settings.arguments as ConnectDeviceModel;
+    final connectDeviceModel = ModalRoute.of(context)?.settings.arguments as ConnectDeviceModel;
     _bluetoothDevice = connectDeviceModel.device;
-    _elinkProbeBoxSendCmdUtils = ElinkProbeBoxCmdUtils(connectDeviceModel.bleData.macArr);
+    _elinkProbeBoxSendCmdUtils = ElinkProbeBoxWithScreenCmdUtils(connectDeviceModel.bleData.macArr);
     _elinkProbeDataParseUtils = ElinkProbeDataParseUtils(connectDeviceModel.bleData.macArr);
-    _elinkProbeDataParseUtils.setProbeBoxCallback(ElinkProbeBoxParseCallback(
+    _elinkProbeDataParseUtils.setProbeBoxWithScreenCallback(ElinkProbeBoxWithScreenParseCallback(
         onGetVersion: (version) {
           _addLog('onGetVersion: $version');
         }, onRequestSyncTime: () {
@@ -114,8 +113,14 @@ class _ProbeBoxDevicePageState extends State<ProbeBoxDevicePage> {
             });
           }
         }, onGetProbeInfo: (probeInfo) {
-          LogUtils().log('onGetProbeInfo: $probeInfo');
-        }
+          _addLog('onGetProbeInfo: $probeInfo');
+        }, onGetProbeInfoFailure: (mac) {
+          _addLog('onGetProbeInfoFailure: ${ElinkBroadcastDataUtils.littleBytes2MacStr(mac)}');
+        }, onCancelAmbientAlarm: (mac, cancel) {
+          _addLog('onCancelAlarm: ${ElinkBroadcastDataUtils.littleBytes2MacStr(mac)}, cancel: $cancel');
+        }, onEndWorkByBox: (mac) {
+          _addLog('onEndWorkByBox: ${ElinkBroadcastDataUtils.littleBytes2MacStr(mac)}');
+        },
     ));
   }
 
@@ -231,13 +236,14 @@ class _ProbeBoxDevicePageState extends State<ProbeBoxDevicePage> {
                     return;
                   }
                   final time = DateTime.now().millisecondsSinceEpoch;
+                  const countDown = 1 * 60 * 1000;
                   final probeInfo = ElinkProbeInfo(
                     mac: mac,
                     id: time,
                     foodType: 0,
                     foodRawness: 2,
-                    targetTempCelsius: 20,
-                    targetTempFahrenheit: 68,
+                    targetTempCelsius: 40,
+                    targetTempFahrenheit: 104,
                     lowerTempLimitCelsius: 0,
                     lowerTempLimitFahrenheit: 32,
                     upperTempLimitCelsius: 100,
@@ -245,11 +251,16 @@ class _ProbeBoxDevicePageState extends State<ProbeBoxDevicePage> {
                     alarmTempPercent: 0.8,
                     currentUnit: unit.index,
                     timerStart: time,
-                    timerEnd: time,
+                    timerEnd: time + countDown,
                     alarmTempCelsius: 35,
                     alarmTempFahrenheit: 95,
+                    timerCountDown: countDown,
+                    remark: 'ProbeBoxWithScreen',
                   );
+                  LogUtils().log('setProbeInfo: $probeInfo');
                   final data = await _elinkProbeBoxSendCmdUtils.setBoxProbeInfo(probeInfo);
+
+                  LogUtils().log('setProbeInfo: ${data.toHex()}');
                   _addLog('setProbeInfo: ${data.toHex()}');
                   _dataA7Characteristic?.write(data, allowLongWrite: true);
                 },
@@ -257,12 +268,7 @@ class _ProbeBoxDevicePageState extends State<ProbeBoxDevicePage> {
               ),
               OperateBtnWidget(
                 onPressed: () async {
-                  final mac = selectProbeInfo?.mac ?? [];
-                  if (mac.isEmpty) {
-                    _showInfo();
-                    return;
-                  }
-                  final data = await _elinkProbeBoxSendCmdUtils.getBoxProbeInfo(mac);
+                  final data = await _elinkProbeBoxSendCmdUtils.getProbeInfo();
                   _addLog('getProbeInfo: ${data.toHex()}');
                   _dataA7Characteristic?.write(data);
                 },
@@ -346,6 +352,7 @@ class _ProbeBoxDevicePageState extends State<ProbeBoxDevicePage> {
           await _setHandShake(characteristic);
         } else if (characteristic.uuid.str.equal(ElinkBleCommonUtils.elinkNotifyUuid)) {
           _onReceiveDataSubscription1 = characteristic.onValueReceived.listen((data) {
+            LogUtils().log('OnValueReceived [${characteristic.uuid.str}]: ${data.toHex()}, checked: ${ElinkCmdUtils.checkElinkCmdSum(data)}');
             _addLog('OnValueReceived [${characteristic.uuid.str}]: ${data.toHex()}, checked: ${ElinkCmdUtils.checkElinkCmdSum(data)}');
             _elinkProbeDataParseUtils.parseElinkData(data);
           });
